@@ -11,7 +11,15 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const EMOJI = "\u{1F917}"; // 🤗
+const EMOJI = String.fromCodePoint(0x1f917); // 🤗
+
+// Gate self-check: the sealed scorer only accepts 1–8 characters of
+// non-whitespace UTF-8, so fail loudly here rather than ship an invalid
+// entry if this constant is ever edited by mistake.
+const charCount = [...EMOJI].length;
+if (charCount < 1 || charCount > 8 || EMOJI.trim() === "") {
+  throw new Error(`entry must be a single emoji, got ${charCount} characters`);
+}
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
